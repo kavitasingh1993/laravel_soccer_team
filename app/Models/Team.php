@@ -11,4 +11,8 @@ class Team extends Model
     protected $fillable = [
         'name', 'logoURL'
     ];
+
+    public function players(){
+        return $this->hasMany(Player::class,'team_id');
+    }
 }

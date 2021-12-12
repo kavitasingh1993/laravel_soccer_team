@@ -7,7 +7,7 @@
                 <h2>Edit Player</h2>
             </div>
             <div class="pull-right">
-                <a class="btn btn-primary" href="{{ route('players.index') }}"> Back</a>
+                <a class="btn btn-primary" href="{{ route('players.index').'?team_id='.$player->team_id}}"> Back</a>
             </div>
         </div>
     </div>
@@ -47,6 +47,7 @@
                     <img src="/image/{{ $player->playerImageURL }}" width="300px">
                 </div>
             </div>
+             <input type="hidden" name="team_id" value="{{$player->team_id}}" class="form-control" placeholder="">
             <div class="col-xs-12 col-sm-12 col-md-12 text-center">
               <button type="submit" class="btn btn-primary">Submit</button>
             </div>

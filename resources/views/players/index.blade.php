@@ -8,7 +8,7 @@
                 <h2>Soccer Team</h2>
             </div>
             <div class="pull-right">
-                <a class="btn btn-success" href="{{ route('players.index') }}"> Back</a>
+                <a class="btn btn-success" href="{{ route('teams.index') }}"> Back</a>
                 <a class="btn btn-success" href="{{ route('players.create',['team_id'=>request()->query('team_id')])}}"> Create New Player</a>
             </div>
         </div>

@@ -5,9 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Team;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\TeamService;
 
 class TeamController extends Controller
 {
+    protected $teamService;
+
+    /**
+     * Instantiate a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct(TeamService $teamService)
+    {
+        $this->teamService = $teamService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,9 +28,8 @@ class TeamController extends Controller
      */
     public function index()
     {
-        $teams = Team::oldest()->paginate(5);
+        $teams = $this->teamService->getAllTeamDetails();
         return view('teams.index',compact('teams'))->with('i', (request()->input('page', 1) - 1) * 5);
-
     }
 
     /**
@@ -45,14 +57,7 @@ class TeamController extends Controller
   
         $input = $request->all();
   
-        if ($image = $request->file('logoURL')) {
-            $destinationPath = 'image/';
-            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $profileImage);
-            $input['logoURL'] = "$profileImage";
-        }
-    
-        Team::create($input);
+        $this->teamService->storeTeamDetails($input);
      
         return redirect()->route('teams.index')
                         ->with('success','Product created successfully.');
@@ -91,22 +96,11 @@ class TeamController extends Controller
     {
         $request->validate([
             'name' => 'required'
-           // 'logoURL' => 'required'
         ]);
   
         $input = $request->all();
-  
-        if ($image = $request->file('logoURL')) {
-            $destinationPath = 'image/';
-            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $profileImage);
-            $input['logoURL'] = "$profileImage";
-        }else{
-            unset($input['logoURL']);
-        }
-          
-        $team->update($input);
-    
+        $this->teamService->updateTeamDetails($input,$team);
+
         return redirect()->route('teams.index')
                         ->with('success','Team updated successfully');
     }
@@ -119,7 +113,10 @@ class TeamController extends Controller
      */
     public function destroy(Team $team)
     {
-        $team->delete();
+        if($team->players->count() > 0){
+            throw new \Exception("You cannot delete team if it has players. Please delete all players first from this team");
+        }
+        $this->teamService->DeleteTeamDetails($team);
      
         return redirect()->route('teams.index')
                         ->with('success','Team deleted successfully');
